@@ -1,0 +1,109 @@
+# Darrel the Demon Slayer
+
+Darrel the Demon Slayer is a 2D action game built in **Go** using **Raylib**. The game features room-based combat, multiple enemy types, melee and ranged attacks, character progression, upgrades, and a save system.
+
+This project was built to practice structuring a larger Go application and managing different game systems such as combat, enemies, player progression, saving, menus, and game states.
+
+## Gameplay
+
+[Watch Gameplay on YouTube](PASTE_YOUTUBE_LINK_HERE)
+
+## Features
+
+* Melee and ranged combat
+* Multiple enemy types
+* Enemy encounters that change as the player progresses
+* Experience and leveling system
+* Character upgrades
+* Health, speed, melee damage, and ranged damage upgrades
+* Room-based gameplay
+* Multiple game states and menus
+* Pause and game over screens
+* Persistent save files
+* Sound effects and audio
+* Sprite-based graphics
+
+## Technologies
+
+* Go
+* Raylib
+* raylib-go
+
+## Game Systems
+
+The project is separated into multiple files and systems instead of keeping all of the game logic inside one file.
+
+Some of the main systems include:
+
+* **Player** - Handles movement, health, experience, levels, and upgrades
+* **Attack Manager** - Controls melee attacks and projectiles
+* **Enemies** - Handles enemy behavior and different enemy types
+* **Encounters** - Controls enemy spawning and combat encounters
+* **Rooms** - Manages the different areas the player can move through
+* **Game Controller** - Controls the current game state and transitions between menus and gameplay
+* **Save System** - Stores and loads player progress
+* **Audio** - Handles music and sound effects
+* **Sprites** - Handles game textures and visual assets
+
+## Project Structure
+
+```text
+darrel-the-demon-slayer/
+├── attack.go
+├── audio.go
+├── encounters.go
+├── enemy.go
+├── gamecontroller.go
+├── main.go
+├── menu.go
+├── physics.go
+├── player.go
+├── rooms.go
+├── save.go
+├── sprites.go
+├── go.mod
+└── assets/
+```
+
+## Running the Game
+
+### Requirements
+
+* Go installed on your system
+* Raylib dependencies required by raylib-go
+
+Clone the repository:
+
+```bash
+git clone https://github.com/merlintheduke/darrel-the-demon-slayer.git
+```
+
+Move into the project folder:
+
+```bash
+cd darrel-the-demon-slayer
+```
+
+Download the Go dependencies:
+
+```bash
+go mod tidy
+```
+
+Run the game:
+
+```bash
+go run .
+```
+
+## What I Learned
+
+This project gave me experience working with a larger codebase in Go and breaking different parts of a program into separate systems.
+
+I worked with game state management, collision and attack logic, enemy encounters, player progression, persistent save data, and organizing different parts of the game so they could interact without putting everything into one file.
+
+It also gave me more experience debugging systems that depend on each other, since changes to areas such as combat, movement, enemies, and progression could affect multiple parts of the game.
+
+## Disclaimer
+
+This project was created for educational purposes.
