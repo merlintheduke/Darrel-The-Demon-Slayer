@@ -1,4 +1,4 @@
-module FinalProject
+module github.com/merlintheduke/darrel-the-demon-slayer
 
 go 1.25.6
 
