@@ -1,0 +1,48 @@
+{
+  "Meta": {
+    "PlayerName": "ghost",
+    "Lvl": 0,
+    "CreatedAt": "2026-05-05",
+    "LastPlayed": 0,
+    "Index": 0
+  },
+  "Player": {
+    "Name": "",
+    "Sprite": {
+      "ID": 5,
+      "Width": 120,
+      "Height": 840,
+      "Mipmaps": 1,
+      "Format": 7
+    },
+    "Color": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255
+    },
+    "Position": {
+      "X": 250,
+      "Y": 250
+    },
+    "Angle": 0,
+    "Scale": 1,
+    "Width": 80,
+    "Height": 10,
+    "Atkrange": 0,
+    "Speed": 300,
+    "MaxHealth": 100,
+    "CurrentHealth": 100,
+    "Alive": true,
+    "Xp": 0,
+    "Level": 1,
+    "XpToNext": 100,
+    "UpgradePoints": 0,
+    "GunDamage": 10,
+    "MeleeDamage": 10,
+    "Roomscleared": 0,
+    "Difficulty": 0
+  },
+  "CurrentRoom": 0,
+  "GameState": 2
+}
