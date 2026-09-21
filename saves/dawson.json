@@ -1,0 +1,32 @@
+{
+  "Meta": {
+    "PlayerName": "dawson",
+    "Lvl": 6,
+    "CreatedAt": "2026-09-20",
+    "LastPlayed": 1789966732,
+    "Index": 0
+  },
+  "Player": {
+    "Name": "dawson",
+    "Position": {
+      "X": 14684.76,
+      "Y": 19191.291
+    },
+    "Angle": 0,
+    "Scale": 1,
+    "Speed": 325,
+    "MaxHealth": 150,
+    "CurrentHealth": 150,
+    "Alive": true,
+    "Xp": 36,
+    "Level": 6,
+    "XpToNext": 303,
+    "UpgradePoints": 2,
+    "GunDamage": 25,
+    "MeleeDamage": 10,
+    "Roomscleared": 18,
+    "Difficulty": 0
+  },
+  "CurrentRoom": 0,
+  "GameState": 8
+}
