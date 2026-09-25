@@ -2,15 +2,15 @@
   "Meta": {
     "PlayerName": "dawson",
     "Lvl": 6,
-    "CreatedAt": "2026-09-20",
-    "LastPlayed": 1789966732,
+    "CreatedAt": "2026-09-24",
+    "LastPlayed": 1790297287,
     "Index": 0
   },
   "Player": {
     "Name": "dawson",
     "Position": {
-      "X": 14684.76,
-      "Y": 19191.291
+      "X": 15450,
+      "Y": 15450
     },
     "Angle": 0,
     "Scale": 1,
@@ -28,5 +28,5 @@
     "Difficulty": 0
   },
   "CurrentRoom": 0,
-  "GameState": 8
+  "GameState": 5
 }
