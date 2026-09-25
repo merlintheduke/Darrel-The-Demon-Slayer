@@ -132,6 +132,7 @@ func (gc *GameController) updatePlaying() {
 		gc.attackManager.SpawnMelee(gc.player.pos, dir, &gc.player, gc.player.MeleeDamage, 120, gc.assets.Textures[melee], 1)
 	}
 
+	gc.player.UpdateAnimation(rl.IsKeyDown(rl.KeySpace) || rl.IsKeyDown(rl.KeyQ))
 	gc.player.Update(&gc.rooms[gc.currentRoom])
 	gc.CheckEncounterTriggers()
 	gc.UpdateEncounters()

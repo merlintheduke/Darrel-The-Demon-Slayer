@@ -1,6 +1,54 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
+)
+
+func TestPlayerAnimatorDefinesNamedClips(t *testing.T) {
+	animator := newPlayerAnimator(rl.Texture2D{ID: 1})
+
+	for _, name := range []string{
+		playerIdleAnimation,
+		playerWalkAnimation,
+		playerAttackAnimation,
+		playerHurtAnimation,
+		playerDeathAnimation,
+	} {
+		clip, ok := animator.Clips[name]
+		if !ok {
+			t.Fatalf("missing player animation clip %q", name)
+		}
+		if clip.FrameCount != 7 || clip.FramesPerSecond != 1 {
+			t.Fatalf("unexpected %q clip: %+v", name, clip)
+		}
+	}
+
+	if animator.Current != playerIdleAnimation {
+		t.Fatalf("current animation = %q, want %q", animator.Current, playerIdleAnimation)
+	}
+}
+
+func TestPlayerUpdateAnimationChoosesMovementStates(t *testing.T) {
+	player := newplayer(rl.Texture2D{ID: 1}, "Test")
+
+	player.UpdateAnimation(false)
+	if player.Renderer.Animator.Current != playerIdleAnimation {
+		t.Fatalf("idle animation = %q, want %q", player.Renderer.Animator.Current, playerIdleAnimation)
+	}
+
+	player.velocity.X = 1
+	player.UpdateAnimation(false)
+	if player.Renderer.Animator.Current != playerWalkAnimation {
+		t.Fatalf("moving animation = %q, want %q", player.Renderer.Animator.Current, playerWalkAnimation)
+	}
+
+	player.UpdateAnimation(true)
+	if player.Renderer.Animator.Current != playerAttackAnimation {
+		t.Fatalf("attacking animation = %q, want %q", player.Renderer.Animator.Current, playerAttackAnimation)
+	}
+}
 
 func TestAnimatorPlayResetsAnimation(t *testing.T) {
 	animator := NewAnimator(map[string]AnimationClip{

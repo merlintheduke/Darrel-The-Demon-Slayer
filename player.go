@@ -18,6 +18,53 @@ type Player struct {
 	Difficulty   int
 }
 
+func newPlayerAnimator(sprite rl.Texture2D) Animator {
+	clips := map[string]AnimationClip{}
+	for _, name := range []string{playerIdleAnimation, playerWalkAnimation} {
+		clips[name] = playerAnimationClip(sprite, true)
+	}
+	for _, name := range []string{playerAttackAnimation, playerHurtAnimation, playerDeathAnimation} {
+		clips[name] = playerAnimationClip(sprite, false)
+	}
+
+	animator := NewAnimator(clips)
+	animator.Play(playerIdleAnimation)
+	return animator
+}
+
+func playerAnimationClip(sprite rl.Texture2D, loop bool) AnimationClip {
+	return AnimationClip{
+		Texture:         sprite,
+		FrameCount:      7,
+		FramesPerSecond: 1,
+		Loop:            loop,
+	}
+}
+
+func (p *Player) UpdateAnimation(attacking bool) {
+	animator := &p.Renderer.Animator
+	if !p.Alive {
+		animator.Play(playerDeathAnimation)
+		return
+	}
+
+	if attacking {
+		animator.Play(playerAttackAnimation)
+		return
+	}
+
+	if (animator.Current == playerAttackAnimation || animator.Current == playerHurtAnimation) && !animator.Finished {
+		return
+	}
+
+	if p.velocity.X != 0 || p.velocity.Y != 0 {
+		animator.Play(playerWalkAnimation)
+		return
+	}
+
+	animator.Play(playerIdleAnimation)
+}
+
 func newplayer(cowboySprite rl.Texture2D, Name string) Player {
 
 	player := Player{
@@ -27,7 +74,13 @@ func newplayer(cowboySprite rl.Texture2D, Name string) Player {
 				pos:      rl.Vector2{X: playerSpawnX, Y: playerSpawnY},
 				velocity: rl.Vector2{X: 0, Y: 0},
 			},
-			Renderer: EntityRenderer{SpriteRenderer: NewAnimatedSpriteRenderer(cowboySprite, rl.White, rl.Vector2{X: playerSpawnX, Y: playerSpawnY}, 1, 0, 7, 1), HealthBar: HealthBar{
+			Renderer: EntityRenderer{SpriteRenderer: SpriteRenderer{
+				Sprite:   cowboySprite,
+				Color:    rl.White,
+				Position: rl.Vector2{X: playerSpawnX, Y: playerSpawnY},
+				Scale:    1,
+				Animator: newPlayerAnimator(cowboySprite),
+			}, HealthBar: HealthBar{
 				Width:  80,
 				Height: 10,
 			}},
@@ -72,6 +125,7 @@ func newEntity(sprite rl.Texture2D) Entity {
 }
 
 func (e *Entity) Update(room *Room) {
+	e.Renderer.Update(rl.GetFrameTime())
 	e.move()
 	e.UpdateCollision(room)
 	e.SyncCollisionBox() // keep it tight after correction
@@ -94,7 +148,11 @@ func (p *Player) TakeDamage(dmg int) {
 	if p.CurrentHealth <= 0 {
 		p.CurrentHealth = 0
 		p.Alive = false
+		p.Renderer.Animator.Play(playerDeathAnimation)
+		return
 	}
+
+	p.Renderer.Animator.Play(playerHurtAnimation)
 }
 
 func (p *Player) GainXP(amount int) {

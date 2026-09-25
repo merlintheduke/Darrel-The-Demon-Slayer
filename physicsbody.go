@@ -20,6 +20,11 @@ type EntityRenderer struct {
 	SpriteRenderer
 	HealthBar
 }
+
+func (renderer *EntityRenderer) Update(deltaTime float32) {
+	renderer.Animator.Update(deltaTime)
+}
+
 type HealthBar struct {
 	Width  float32
 	Height float32

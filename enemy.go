@@ -217,6 +217,7 @@ func (e *Enemy) update(room *Room, attackManager *AttackManager) {
 	if room != nil {
 		e.Entity.Update(room)
 	} else {
+		e.Renderer.Update(rl.GetFrameTime())
 		e.move()
 	}
 }

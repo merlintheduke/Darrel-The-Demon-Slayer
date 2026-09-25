@@ -78,7 +78,7 @@ func (sp SavePlayer) toPlayer() Player {
 				pos:      sp.Position,
 				velocity: rl.Vector2Zero(),
 			},
-			Renderer:      EntityRenderer{SpriteRenderer: NewAnimatedSpriteRenderer(rl.Texture2D{}, rl.White, sp.Position, sp.Scale, sp.Angle, 7, 1), HealthBar: HealthBar{Width: 80, Height: 10}},
+			Renderer:      EntityRenderer{SpriteRenderer: SpriteRenderer{Sprite: rl.Texture2D{}, Color: rl.White, Position: sp.Position, Angle: sp.Angle, Scale: sp.Scale}, HealthBar: HealthBar{Width: 80, Height: 10}},
 			Speed:         sp.Speed,
 			MaxHealth:     sp.MaxHealth,
 			CurrentHealth: sp.CurrentHealth,
@@ -250,10 +250,7 @@ func (gc *GameController) FixPlayerAfterLoad() {
 	gc.player.Renderer.Sprite = gc.assets.Textures[cowboy]
 	gc.player.Renderer.Color = rl.White
 	gc.player.Renderer.Scale = 1
-	gc.player.Renderer.Animator = NewAnimator(map[string]AnimationClip{
-		"default": {Texture: gc.assets.Textures[cowboy], FrameCount: 7, FramesPerSecond: 1, Loop: true},
-	})
-	gc.player.Renderer.Animator.Play("default")
+	gc.player.Renderer.Animator = newPlayerAnimator(gc.assets.Textures[cowboy])
 
 	if gc.player.Position.X != 0 || gc.player.Position.Y != 0 {
 		gc.player.pos = gc.player.Position

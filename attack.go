@@ -116,6 +116,8 @@ func (am *AttackManager) Update(dt float32) {
 			continue
 		}
 
+		a.SpriteRenderer.Animator.Update(dt)
+
 		if a.Type == Projectile {
 			a.pos = rl.Vector2Add(a.pos, rl.Vector2Scale(a.velocity, dt))
 			a.SpriteRenderer.Position = a.pos

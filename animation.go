@@ -2,6 +2,14 @@ package main
 
 import rl "github.com/gen2brain/raylib-go/raylib"
 
+const (
+	playerIdleAnimation   = "idle"
+	playerWalkAnimation   = "walk"
+	playerAttackAnimation = "attack"
+	playerHurtAnimation   = "hurt"
+	playerDeathAnimation  = "death"
+)
+
 type AnimationClip struct {
 	Texture         rl.Texture2D
 	FrameCount      int
