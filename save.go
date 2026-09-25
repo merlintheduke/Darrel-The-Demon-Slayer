@@ -1,11 +1,7 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
 	"time"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -123,13 +119,6 @@ func (gc *GameController) SaveGame(filename string) error {
 
 		filename = gc.currentSave.PlayerName
 	}
-
-	err := os.MkdirAll("saves", 0755)
-	if err != nil {
-		return err
-	}
-
-	file := filepath.Join("saves", filename+".json")
 	playerSnapshot := newSavePlayer(gc.player)
 	if playerSnapshot.Name == "" {
 		playerSnapshot.Name = filename
@@ -148,13 +137,7 @@ func (gc *GameController) SaveGame(filename string) error {
 		GameState:   gc.gamestate,
 	}
 
-	data, err := json.MarshalIndent(savegame, "", "  ")
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-
-	return os.WriteFile(file, data, 0644)
+	return gc.saveRepository.Save(savegame)
 }
 
 func (gc *GameController) SaveCurrentGame() {
@@ -174,9 +157,7 @@ func (gc *GameController) DeleteSave(playerName string) {
 		return
 	}
 
-	filename := filepath.Join("saves", playerName+".json")
-
-	err := os.Remove(filename)
+	err := gc.saveRepository.Delete(playerName)
 	if err != nil {
 		fmt.Println("Delete save error:", err)
 	}
@@ -197,49 +178,14 @@ func (gc *GameController) DeleteCurrentSave() {
 }
 
 func (gc *GameController) LoadSaves() []SaveMeta {
-	files, err := os.ReadDir("saves")
+	saveMetadata, err := gc.saveRepository.List()
 	if err != nil {
 		return nil
 	}
-
-	var savemeta []SaveMeta
-	for i, file := range files {
-		if file.IsDir() || !strings.HasSuffix(file.Name(), ".json") {
-			continue
-		}
-
-		data, err := os.ReadFile(filepath.Join("saves", file.Name()))
-		if err != nil {
-			continue
-		}
-
-		var save SaveGame
-		if err := json.Unmarshal(data, &save); err != nil {
-			continue
-		}
-		if save.Meta.PlayerName == "" {
-			save.Meta.PlayerName = save.Player.Name
-		}
-		if save.Meta.PlayerName == "" {
-			continue
-		}
-
-		savemeta = append(savemeta, SaveMeta{
-			PlayerName: save.Meta.PlayerName,
-			Lvl:        save.Player.Level,
-			CreatedAt:  save.Meta.CreatedAt,
-			LastPlayed: save.Meta.LastPlayed,
-			Index:      i,
-		})
-	}
-	return savemeta
+	return saveMetadata
 }
 
 func (gc *GameController) NewSaveGame(filename string) error {
-	filesname := filename + ".json"
-	folder := "saves"
-	filepath := filepath.Join(folder, filesname)
-
 	savemeta := SaveMeta{
 		PlayerName: filename,
 		Lvl:        0,
@@ -256,13 +202,7 @@ func (gc *GameController) NewSaveGame(filename string) error {
 		savegame.Player.Name = filename
 	}
 
-	data, err := json.MarshalIndent(savegame, "", "  ")
-	if err != nil {
-		return err
-	}
-
-	err = os.WriteFile(filepath, data, 0644)
-	if err != nil {
+	if err := gc.saveRepository.Save(savegame); err != nil {
 		return err
 	}
 
@@ -271,7 +211,7 @@ func (gc *GameController) NewSaveGame(filename string) error {
 		Index:      0,
 		Exists:     true,
 	}
-	err = gc.LoadGame(filename)
+	err := gc.LoadGame(filename)
 	if err != nil {
 		fmt.Println("New save load error:", err)
 		return err
@@ -283,18 +223,9 @@ func (gc *GameController) NewSaveGame(filename string) error {
 }
 
 func (gc *GameController) LoadGame(playerName string) error {
-	filename := filepath.Join("saves", playerName+".json")
-
-	data, err := os.ReadFile(filename)
+	save, err := gc.saveRepository.Load(playerName)
 	if err != nil {
-		fmt.Println("LoadGame read error:", err)
-		return err
-	}
-
-	var save SaveGame
-	err = json.Unmarshal(data, &save)
-	if err != nil {
-		fmt.Println("LoadGame json error:", err)
+		fmt.Println("LoadGame error:", err)
 		return err
 	}
 

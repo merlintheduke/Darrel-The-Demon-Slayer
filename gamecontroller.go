@@ -7,17 +7,18 @@ import (
 )
 
 type GameController struct {
-	Sprites       []rl.Texture2D
-	player        Player
-	rooms         []Room
-	currentRoom   int
-	enemies       []Enemy
-	attackManager AttackManager
-	menus         map[GameState]Menu
-	gamestate     GameState
-	camera        rl.Camera2D
-	saveslot      []SaveSlot
-	currentSave   *SaveSlot
+	Sprites        []rl.Texture2D
+	player         Player
+	rooms          []Room
+	currentRoom    int
+	enemies        []Enemy
+	attackManager  AttackManager
+	menus          map[GameState]Menu
+	saveRepository SaveRepository
+	gamestate      GameState
+	camera         rl.Camera2D
+	saveslot       []SaveSlot
+	currentSave    *SaveSlot
 }
 type GameState int
 
@@ -45,11 +46,12 @@ func NewGameController() GameController {
 		1,                      // zoom
 	)
 	GameController := GameController{
-		rooms:     rooms,
-		enemies:   enemy,
-		menus:     make(map[GameState]Menu),
-		gamestate: menu,
-		camera:    camera,
+		rooms:          rooms,
+		enemies:        enemy,
+		menus:          make(map[GameState]Menu),
+		saveRepository: SaveRepository{Directory: "saves"},
+		gamestate:      menu,
+		camera:         camera,
 	}
 	return GameController
 }
