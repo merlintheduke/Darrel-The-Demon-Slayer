@@ -1,7 +1,5 @@
 package main
 
-import rl "github.com/gen2brain/raylib-go/raylib"
-
 const (
 	playerIdleAnimation   = "idle"
 	playerWalkAnimation   = "walk"
@@ -9,13 +7,6 @@ const (
 	playerHurtAnimation   = "hurt"
 	playerDeathAnimation  = "death"
 )
-
-type AnimationClip struct {
-	Texture         rl.Texture2D
-	FrameCount      int
-	FramesPerSecond float32
-	Loop            bool
-}
 
 type Animator struct {
 	Clips    map[string]AnimationClip
@@ -34,6 +25,17 @@ func (a *Animator) Play(name string) {
 		return
 	}
 	if a.Current == name {
+		return
+	}
+
+	a.Current = name
+	a.Frame = 0
+	a.Elapsed = 0
+	a.Finished = false
+}
+
+func (a *Animator) Replay(name string) {
+	if _, ok := a.Clips[name]; !ok {
 		return
 	}
 

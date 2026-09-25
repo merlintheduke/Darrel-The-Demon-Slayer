@@ -50,6 +50,99 @@ func TestPlayerUpdateAnimationChoosesMovementStates(t *testing.T) {
 	}
 }
 
+func TestPlayerWalkAnimationAdvancesFrames(t *testing.T) {
+	player := newplayer(rl.Texture2D{ID: 1}, "Test")
+	player.Renderer.SpriteAnimator = NewSpriteAnimator(map[AnimationID]AnimationClip{
+		AnimationIdle: {Texture: rl.Texture2D{ID: 1}, Columns: 4, Rows: 8, Frames: 4, FPS: 5, Loop: true},
+		AnimationWalk: {Texture: rl.Texture2D{ID: 1}, Columns: 4, Rows: 8, Frames: 4, FPS: 9, Loop: true, Directional: true},
+		AnimationGun:  {Texture: rl.Texture2D{ID: 1}, Columns: 4, Rows: 8, Frames: 4, FPS: 16, Loop: false, Directional: true},
+	}, AnimationIdle)
+
+	player.velocity.X = 1
+	player.UpdateAnimation(false)
+	if player.Renderer.SpriteAnimator.Current != AnimationWalk {
+		t.Fatalf("atlas animation = %q, want %q", player.Renderer.SpriteAnimator.Current, AnimationWalk)
+	}
+
+	player.Renderer.Update(1.0 / 9.0)
+	if player.Renderer.SpriteAnimator.Frame != 1 {
+		t.Fatalf("walk frame = %d, want 1", player.Renderer.SpriteAnimator.Frame)
+	}
+
+	player.UpdateAnimation(false)
+	if player.Renderer.SpriteAnimator.Frame != 1 {
+		t.Fatalf("walk frame reset during state refresh: frame=%d", player.Renderer.SpriteAnimator.Frame)
+	}
+}
+
+func TestPlayerSprintAnimationUsesSprintClip(t *testing.T) {
+	player := newplayer(rl.Texture2D{ID: 1}, "Test")
+	player.Renderer.SpriteAnimator = NewSpriteAnimator(map[AnimationID]AnimationClip{
+		AnimationIdle:   {Texture: rl.Texture2D{ID: 1}, Columns: 4, Rows: 8, Frames: 4, FPS: 5, Loop: true},
+		AnimationSprint: {Texture: rl.Texture2D{ID: 1}, Columns: 4, Rows: 8, Frames: 4, FPS: 13, Loop: true, Directional: true},
+	}, AnimationIdle)
+
+	player.velocity.X = 1
+	player.Sprinting = true
+	player.UpdateAnimation(false)
+	if player.Renderer.SpriteAnimator.Current != AnimationSprint {
+		t.Fatalf("sprint animation = %q, want %q", player.Renderer.SpriteAnimator.Current, AnimationSprint)
+	}
+}
+
+func TestPlayerAttackUsesGunAnimation(t *testing.T) {
+	player := newplayer(rl.Texture2D{ID: 1}, "Test")
+	player.Renderer.SpriteAnimator = NewSpriteAnimator(map[AnimationID]AnimationClip{
+		AnimationIdle: {Texture: rl.Texture2D{ID: 1}, Columns: 4, Rows: 8, Frames: 4, FPS: 5, Loop: true},
+		AnimationGun:  {Texture: rl.Texture2D{ID: 1}, Columns: 4, Rows: 8, Frames: 4, FPS: 16, Loop: false, Directional: true},
+	}, AnimationIdle)
+
+	player.UpdateAnimation(true)
+	if player.Renderer.SpriteAnimator.Current != AnimationGun {
+		t.Fatalf("attack animation = %q, want %q", player.Renderer.SpriteAnimator.Current, AnimationGun)
+	}
+}
+
+func TestPlayerGunCooldownMatchesAnimation(t *testing.T) {
+	player := newplayer(rl.Texture2D{ID: 1}, "Test")
+	if !player.CanShoot() {
+		t.Fatal("new player should be able to shoot")
+	}
+
+	player.StartGunAttack()
+	if player.CanShoot() {
+		t.Fatal("player shot again before the gun animation duration")
+	}
+
+	player.UpdateShootCooldown(playerGunCooldown - 0.001)
+	if player.CanShoot() {
+		t.Fatal("player cooldown ended before the gun animation duration")
+	}
+
+	player.UpdateShootCooldown(0.002)
+	if !player.CanShoot() {
+		t.Fatal("player cooldown did not end with the gun animation duration")
+	}
+}
+
+func TestDeathAnimationMustFinishBeforeGameOver(t *testing.T) {
+	player := newplayer(rl.Texture2D{ID: 1}, "Test")
+	player.Renderer.SpriteAnimator = NewSpriteAnimator(map[AnimationID]AnimationClip{
+		AnimationDeath: {Texture: rl.Texture2D{ID: 1}, Columns: 4, Rows: 8, Frames: 4, FPS: 8, Loop: false, Directional: true},
+	}, AnimationDeath)
+
+	player.Alive = false
+	player.Renderer.SpriteAnimator.Play(AnimationDeath)
+	if player.DeathAnimationFinished() {
+		t.Fatal("death animation finished before any frames elapsed")
+	}
+
+	player.Renderer.SpriteAnimator.Update(0.5)
+	if !player.DeathAnimationFinished() {
+		t.Fatal("death animation did not finish after its full duration")
+	}
+}
+
 func TestAnimatorPlayResetsAnimation(t *testing.T) {
 	animator := NewAnimator(map[string]AnimationClip{
 		"walk": {FrameCount: 4, FramesPerSecond: 8, Loop: true},

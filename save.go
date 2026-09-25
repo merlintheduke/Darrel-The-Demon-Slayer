@@ -251,6 +251,7 @@ func (gc *GameController) FixPlayerAfterLoad() {
 	gc.player.Renderer.Color = rl.White
 	gc.player.Renderer.Scale = 1
 	gc.player.Renderer.Animator = newPlayerAnimator(gc.assets.Textures[cowboy])
+	gc.player.Renderer.SpriteAnimator = newPlayerSpriteAnimator()
 
 	if gc.player.Position.X != 0 || gc.player.Position.Y != 0 {
 		gc.player.pos = gc.player.Position

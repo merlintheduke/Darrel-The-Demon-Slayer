@@ -23,6 +23,18 @@ type EntityRenderer struct {
 
 func (renderer *EntityRenderer) Update(deltaTime float32) {
 	renderer.Animator.Update(deltaTime)
+	renderer.SpriteAnimator.Update(deltaTime)
+	if renderer.Sprite.ID == 0 || renderer.Sprite.Width != 480 || renderer.Sprite.Height != 960 {
+		return
+	}
+
+	renderer.FrameTimer += deltaTime
+	if renderer.FrameTimer < 0.2 {
+		return
+	}
+
+	renderer.FrameTimer = 0
+	renderer.CurrentFrame = (renderer.CurrentFrame + 1) % 4
 }
 
 type HealthBar struct {

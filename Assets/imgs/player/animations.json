@@ -1,0 +1,98 @@
+{
+  "format_version": 1,
+  "frame_width": 120,
+  "frame_height": 120,
+  "direction_order": [
+    "south",
+    "southeast",
+    "east",
+    "northeast",
+    "north",
+    "northwest",
+    "west",
+    "southwest"
+  ],
+  "animations": {
+    "idle": {
+      "sheet": "Assets/imgs/player/idle.png",
+      "columns": 4,
+      "rows": 8,
+      "frames": 4,
+      "fps": 5,
+      "loop": true,
+      "directional": true
+    },
+    "walk": {
+      "sheet": "Assets/imgs/player/walk.png",
+      "columns": 4,
+      "rows": 8,
+      "frames": 4,
+      "fps": 9,
+      "loop": true,
+      "directional": true
+    },
+    "sprint": {
+      "sheet": "Assets/imgs/player/sprint.png",
+      "columns": 4,
+      "rows": 8,
+      "frames": 4,
+      "fps": 13,
+      "loop": true,
+      "directional": true
+    },
+    "gun": {
+      "sheet": "Assets/imgs/player/gun.png",
+      "columns": 4,
+      "rows": 8,
+      "frames": 4,
+      "fps": 16,
+      "loop": false,
+      "directional": true
+    },
+    "sword": {
+      "sheet": "Assets/imgs/player/sword.png",
+      "columns": 4,
+      "rows": 8,
+      "frames": 4,
+      "fps": 14,
+      "loop": false,
+      "directional": true
+    },
+    "fist": {
+      "sheet": "Assets/imgs/player/fist.png",
+      "columns": 4,
+      "rows": 8,
+      "frames": 4,
+      "fps": 16,
+      "loop": false,
+      "directional": true
+    },
+    "hurt": {
+      "sheet": "Assets/imgs/player/hurt.png",
+      "columns": 4,
+      "rows": 8,
+      "frames": 4,
+      "fps": 14,
+      "loop": false,
+      "directional": true
+    },
+    "heal": {
+      "sheet": "Assets/imgs/player/heal.png",
+      "columns": 4,
+      "rows": 8,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "directional": true
+    },
+    "death": {
+      "sheet": "Assets/imgs/player/death.png",
+      "columns": 4,
+      "rows": 8,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "directional": true
+    }
+  }
+}

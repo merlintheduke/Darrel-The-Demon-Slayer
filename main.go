@@ -40,6 +40,7 @@ func main() {
 	BuildMode := false
 	assets := LoadAssets()
 	defer assets.Unload()
+	LoadPlayerAnimatorTemplate()
 
 	gc := NewGameController()
 	gc.assets = assets

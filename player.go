@@ -14,11 +14,62 @@ type Player struct {
 	GunDamage   int
 	MeleeDamage int
 
-	Roomscleared int
-	Difficulty   int
+	Roomscleared  int
+	Difficulty    int
+	Sprinting     bool
+	shootCooldown float32
 }
 
 func newPlayerAnimator(sprite rl.Texture2D) Animator {
+	if playerAnimatorTemplate.Ready() {
+		clips := map[string]AnimationClip{}
+		if clip, ok := playerAnimatorTemplate.Clip(AnimationIdle); ok {
+			clips[playerIdleAnimation] = AnimationClip{
+				Texture:         clip.Texture,
+				FrameCount:      int(clip.Frames),
+				FramesPerSecond: clip.FPS,
+				Loop:            clip.Loop,
+			}
+		}
+		if clip, ok := playerAnimatorTemplate.Clip(AnimationWalk); ok {
+			clips[playerWalkAnimation] = AnimationClip{
+				Texture:         clip.Texture,
+				FrameCount:      int(clip.Frames),
+				FramesPerSecond: clip.FPS,
+				Loop:            clip.Loop,
+			}
+		}
+		if clip, ok := playerAnimatorTemplate.Clip(AnimationGun); ok {
+			clips[playerAttackAnimation] = AnimationClip{
+				Texture:         clip.Texture,
+				FrameCount:      int(clip.Frames),
+				FramesPerSecond: clip.FPS,
+				Loop:            clip.Loop,
+			}
+		}
+		if clip, ok := playerAnimatorTemplate.Clip(AnimationHurt); ok {
+			clips[playerHurtAnimation] = AnimationClip{
+				Texture:         clip.Texture,
+				FrameCount:      int(clip.Frames),
+				FramesPerSecond: clip.FPS,
+				Loop:            clip.Loop,
+			}
+		}
+		if clip, ok := playerAnimatorTemplate.Clip(AnimationDeath); ok {
+			clips[playerDeathAnimation] = AnimationClip{
+				Texture:         clip.Texture,
+				FrameCount:      int(clip.Frames),
+				FramesPerSecond: clip.FPS,
+				Loop:            clip.Loop,
+			}
+		}
+		if len(clips) >= 5 {
+			animator := NewAnimator(clips)
+			animator.Play(playerIdleAnimation)
+			return animator
+		}
+	}
+
 	clips := map[string]AnimationClip{}
 	for _, name := range []string{playerIdleAnimation, playerWalkAnimation} {
 		clips[name] = playerAnimationClip(sprite, true)
@@ -41,31 +92,83 @@ func playerAnimationClip(sprite rl.Texture2D, loop bool) AnimationClip {
 	}
 }
 
+func newPlayerSpriteAnimator() SpriteAnimator {
+	if playerAnimatorTemplate.Ready() {
+		return NewPlayerAnimator()
+	}
+	return SpriteAnimator{}
+}
+
 func (p *Player) UpdateAnimation(attacking bool) {
 	animator := &p.Renderer.Animator
+	spriteAnimator := &p.Renderer.SpriteAnimator
 	if !p.Alive {
 		animator.Play(playerDeathAnimation)
+		spriteAnimator.Play(AnimationDeath)
 		return
 	}
 
 	if attacking {
 		animator.Play(playerAttackAnimation)
+		spriteAnimator.Play(AnimationGun)
 		return
 	}
 
 	if (animator.Current == playerAttackAnimation || animator.Current == playerHurtAnimation) && !animator.Finished {
 		return
 	}
+	if spriteAnimator.IsLocked() {
+		return
+	}
 
 	if p.velocity.X != 0 || p.velocity.Y != 0 {
-		animator.Play(playerWalkAnimation)
+		if p.Sprinting {
+			animator.Play(playerWalkAnimation)
+			spriteAnimator.Play(AnimationSprint)
+		} else {
+			animator.Play(playerWalkAnimation)
+			spriteAnimator.Play(AnimationWalk)
+		}
+		spriteAnimator.SetFacing(p.velocity)
 		return
 	}
 
 	animator.Play(playerIdleAnimation)
+	spriteAnimator.Play(AnimationIdle)
+}
+
+func (p *Player) SetFacing(direction rl.Vector2) {
+	p.Renderer.SpriteAnimator.SetFacing(direction)
+}
+
+func (p *Player) UpdateShootCooldown(deltaTime float32) {
+	p.shootCooldown -= deltaTime
+	if p.shootCooldown < 0 {
+		p.shootCooldown = 0
+	}
+}
+
+func (p *Player) CanShoot() bool {
+	return p.shootCooldown <= 0
+}
+
+func (p *Player) StartGunAttack() {
+	p.shootCooldown = playerGunCooldown
+	p.Renderer.Animator.Replay(playerAttackAnimation)
+	p.Renderer.SpriteAnimator.Replay(AnimationGun)
+}
+
+func (p *Player) DeathAnimationFinished() bool {
+	if p.Renderer.SpriteAnimator.Ready() {
+		return p.Renderer.SpriteAnimator.Current == AnimationDeath && p.Renderer.SpriteAnimator.IsComplete()
+	}
+	return p.Renderer.Animator.Current == playerDeathAnimation && p.Renderer.Animator.Finished
 }
 
 func newplayer(cowboySprite rl.Texture2D, Name string) Player {
+	if cowboySprite.ID == 0 && rl.IsWindowReady() {
+		cowboySprite = LoadPlayerIdleTexture()
+	}
 
 	player := Player{
 		Entity: Entity{
@@ -75,11 +178,14 @@ func newplayer(cowboySprite rl.Texture2D, Name string) Player {
 				velocity: rl.Vector2{X: 0, Y: 0},
 			},
 			Renderer: EntityRenderer{SpriteRenderer: SpriteRenderer{
-				Sprite:   cowboySprite,
-				Color:    rl.White,
-				Position: rl.Vector2{X: playerSpawnX, Y: playerSpawnY},
-				Scale:    1,
-				Animator: newPlayerAnimator(cowboySprite),
+				Sprite:         cowboySprite,
+				Color:          rl.White,
+				Position:       rl.Vector2{X: playerSpawnX, Y: playerSpawnY},
+				Scale:          1,
+				CurrentFrame:   0,
+				FacingRow:      0,
+				Animator:       newPlayerAnimator(cowboySprite),
+				SpriteAnimator: newPlayerSpriteAnimator(),
 			}, HealthBar: HealthBar{
 				Width:  80,
 				Height: 10,
@@ -109,7 +215,7 @@ func (e *Entity) move() {
 }
 
 func newEntity(sprite rl.Texture2D) Entity {
-	Entity := Entity{
+	entity := Entity{
 		PhysicsBody: PhysicsBody{
 			pos:      rl.Vector2{X: playerSpawnX, Y: playerSpawnY},
 			velocity: rl.Vector2{X: 0, Y: 0},
@@ -121,7 +227,7 @@ func newEntity(sprite rl.Texture2D) Entity {
 		CurrentHealth: 100,
 		Alive:         true,
 	}
-	return Entity
+	return entity
 }
 
 func (e *Entity) Update(room *Room) {
@@ -149,10 +255,12 @@ func (p *Player) TakeDamage(dmg int) {
 		p.CurrentHealth = 0
 		p.Alive = false
 		p.Renderer.Animator.Play(playerDeathAnimation)
+		p.Renderer.SpriteAnimator.Play(AnimationDeath)
 		return
 	}
 
 	p.Renderer.Animator.Play(playerHurtAnimation)
+	p.Renderer.SpriteAnimator.Play(AnimationHurt)
 }
 
 func (p *Player) GainXP(amount int) {

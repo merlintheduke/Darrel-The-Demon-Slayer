@@ -10,6 +10,8 @@ const (
 	playerSpawnX    = 250
 	playerSpawnY    = 250
 
-	entityCollisionWidth  = 50
-	entityCollisionHeight = 100
+	entityCollisionWidth   = 50
+	entityCollisionHeight  = 100
+	playerSprintMultiplier = 1.5
+	playerGunCooldown      = 4.0 / 16.0
 )

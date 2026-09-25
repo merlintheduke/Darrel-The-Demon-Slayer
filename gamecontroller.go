@@ -104,31 +104,40 @@ func (gc *GameController) updateStateTransitions() bool {
 func (gc *GameController) updatePlaying() {
 	gc.camera.Target = gc.player.pos
 	gc.camera.Offset = rl.Vector2{X: cameraCenterX, Y: cameraCenterY}
+	gc.player.UpdateShootCooldown(rl.GetFrameTime())
 
 	gc.player.velocity = rl.Vector2{X: 0, Y: 0}
+	gc.player.Sprinting = rl.IsKeyDown(rl.KeyLeftShift) || rl.IsKeyDown(rl.KeyRightShift)
+	moveSpeed := gc.player.Speed
+	if gc.player.Sprinting {
+		moveSpeed *= playerSprintMultiplier
+	}
 
 	if rl.IsKeyDown(rl.KeyD) {
-		gc.player.velocity.X += gc.player.Speed
+		gc.player.velocity.X += moveSpeed
 	}
 	if rl.IsKeyDown(rl.KeyA) {
-		gc.player.velocity.X -= gc.player.Speed
+		gc.player.velocity.X -= moveSpeed
 	}
 	if rl.IsKeyDown(rl.KeyW) {
-		gc.player.velocity.Y -= gc.player.Speed
+		gc.player.velocity.Y -= moveSpeed
 	}
 	if rl.IsKeyDown(rl.KeyS) {
-		gc.player.velocity.Y += gc.player.Speed
+		gc.player.velocity.Y += moveSpeed
 	}
 
 	mouses := rl.GetMousePosition()
 	mouseWorld := rl.GetScreenToWorld2D(mouses, gc.camera)
 	dir := rl.Vector2Subtract(mouseWorld, gc.player.pos)
 
-	if rl.IsKeyPressed(rl.KeySpace) {
+	if rl.IsKeyDown(rl.KeySpace) && gc.player.CanShoot() {
+		gc.player.SetFacing(dir)
 		gc.attackManager.SpawnProjectile(gc.player.pos, dir, &gc.player, gc.player.GunDamage, gc.assets.Textures[bullet], 0)
+		gc.player.StartGunAttack()
 	}
 
 	if rl.IsKeyPressed(rl.KeyQ) {
+		gc.player.SetFacing(dir)
 		gc.attackManager.SpawnMelee(gc.player.pos, dir, &gc.player, gc.player.MeleeDamage, 120, gc.assets.Textures[melee], 1)
 	}
 
@@ -143,6 +152,9 @@ func (gc *GameController) updatePlaying() {
 	gc.attackManager.Update(rl.GetFrameTime())
 	gc.CheckEncounterHits()
 	if gc.player.CurrentHealth <= 0 || !gc.player.Alive {
+		if !gc.player.DeathAnimationFinished() {
+			return
+		}
 		gc.TriggerGameOver()
 	}
 }

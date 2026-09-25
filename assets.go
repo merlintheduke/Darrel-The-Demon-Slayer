@@ -11,7 +11,7 @@ func LoadAssets() Assets {
 	textures := []rl.Texture2D{
 		rl.LoadTexture("Assets/imgs/buttonbox.png"),
 		rl.LoadTexture("Assets/imgs/smallXbutton.png"),
-		rl.LoadTexture("Assets/imgs/CowboySpriteSheet.png"),
+		rl.LoadTexture("Assets/imgs/player/idle.png"),
 		rl.LoadTexture("Assets/imgs/tilesart.jpg"),
 		rl.LoadTexture("Assets/imgs/demonV1F1.png"),
 		rl.LoadTexture("Assets/imgs/bullet.png"),
