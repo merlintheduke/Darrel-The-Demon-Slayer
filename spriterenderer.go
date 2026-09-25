@@ -3,49 +3,67 @@ package main
 import rl "github.com/gen2brain/raylib-go/raylib"
 
 type SpriteRenderer struct {
-	Sprite       rl.Texture2D
-	Color        rl.Color
-	Position     rl.Vector2
-	Angle        float32
-	Scale        float32
-	frameSize    int
-	totalFrames  int
-	currentFrame int
+	Sprite   rl.Texture2D
+	Color    rl.Color
+	Position rl.Vector2
+	Angle    float32
+	Scale    float32
+	Animator Animator
 }
 
 func NewSpriteRenderer(sprite rl.Texture2D, newColor rl.Color, newPosition rl.Vector2, scale float32, angle float32) SpriteRenderer {
 	sr := SpriteRenderer{
-		Sprite:       sprite,
-		Color:        newColor,
-		Position:     newPosition,
-		Angle:        angle,
-		Scale:        scale,
-		frameSize:    100,
-		totalFrames:  1,
-		currentFrame: 1,
+		Sprite:   sprite,
+		Color:    newColor,
+		Position: newPosition,
+		Angle:    angle,
+		Scale:    scale,
+		Animator: NewAnimator(map[string]AnimationClip{
+			"default": {Texture: sprite, FrameCount: 1, FramesPerSecond: 1, Loop: true},
+		}),
 	}
+	sr.Animator.Play("default")
+	return sr
+}
+
+func NewAnimatedSpriteRenderer(sprite rl.Texture2D, newColor rl.Color, newPosition rl.Vector2, scale float32, angle float32, frameCount int, framesPerSecond float32) SpriteRenderer {
+	sr := NewSpriteRenderer(sprite, newColor, newPosition, scale, angle)
+	sr.Animator.Clips["default"] = AnimationClip{
+		Texture:         sprite,
+		FrameCount:      frameCount,
+		FramesPerSecond: framesPerSecond,
+		Loop:            true,
+	}
+	sr.Animator.Play("default")
 	return sr
 }
 
 func (sr SpriteRenderer) Draw() {
-	frameHeight := float32(sr.Sprite.Height) / float32(sr.totalFrames)
-	sourceRect := rl.NewRectangle(0, float32((sr.currentFrame-1))*frameHeight, float32(sr.Sprite.Width), frameHeight)
-	destRect := rl.NewRectangle(sr.Position.X, sr.Position.Y, float32(sr.Sprite.Width)*sr.Scale, frameHeight*sr.Scale)
+	clip, ok := sr.Animator.CurrentClip()
+	if !ok {
+		clip = AnimationClip{Texture: sr.Sprite, FrameCount: 1}
+	}
+
+	frameCount := clip.FrameCount
+	if frameCount <= 0 {
+		frameCount = 1
+	}
+	frame := sr.Animator.Frame
+	if frame < 0 || frame >= frameCount {
+		frame = 0
+	}
+
+	frameHeight := float32(clip.Texture.Height) / float32(frameCount)
+	sourceRect := rl.NewRectangle(0, float32(frame)*frameHeight, float32(clip.Texture.Width), frameHeight)
+	destRect := rl.NewRectangle(sr.Position.X, sr.Position.Y, float32(clip.Texture.Width)*sr.Scale, frameHeight*sr.Scale)
 	origin := rl.Vector2Scale(
 		rl.NewVector2(
-			float32(sr.Sprite.Width)/2,
+			float32(clip.Texture.Width)/2,
 			frameHeight/2,
 		),
 		sr.Scale,
 	)
-	rl.DrawTexturePro(sr.Sprite, sourceRect,
+	rl.DrawTexturePro(clip.Texture, sourceRect,
 		destRect,
 		origin, sr.Angle, sr.Color)
-}
-
-func (sr *SpriteRenderer) nextFrame() {
-	sr.currentFrame++
-	if sr.currentFrame > sr.totalFrames {
-		sr.currentFrame = 1
-	}
 }

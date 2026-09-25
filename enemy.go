@@ -181,8 +181,6 @@ func newEnemy(enemyType EnemyType, position rl.Vector2, target *Player, textures
 		Height: 8,
 	}
 
-	enemy.Renderer.totalFrames = 1
-	enemy.Renderer.currentFrame = 1
 	enemy.Renderer.Scale = 1
 	enemy.Renderer.Color = rl.White
 

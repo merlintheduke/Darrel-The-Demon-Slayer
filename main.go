@@ -81,9 +81,6 @@ func main() {
 
 		rl.EndMode2D()
 		rl.DrawText("Hello, World!", 10, 10, 30, rl.RayWhite)
-		if rl.IsKeyPressed(rl.KeySpace) {
-			player.nextFrame()
-		}
 		*/
 		//player.collisionBox = rl.NewRectangle(player.Position.X-20*player.Scale, player.Position.Y-42*player.Scale, 40*player.Scale, 90*player.Scale)
 		rl.EndDrawing()
