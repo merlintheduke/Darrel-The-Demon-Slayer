@@ -54,7 +54,7 @@ func TestPlayerWalkAnimationAdvancesFrames(t *testing.T) {
 	player := newplayer(rl.Texture2D{ID: 1}, "Test")
 	player.Renderer.SpriteAnimator = NewSpriteAnimator(map[AnimationID]AnimationClip{
 		AnimationIdle: {Texture: rl.Texture2D{ID: 1}, Columns: 4, Rows: 8, Frames: 4, FPS: 5, Loop: true},
-		AnimationWalk: {Texture: rl.Texture2D{ID: 1}, Columns: 4, Rows: 8, Frames: 4, FPS: 9, Loop: true, Directional: true},
+		AnimationWalk: {Texture: rl.Texture2D{ID: 1}, Columns: 8, Rows: 8, Frames: 8, FPS: 6, Loop: true, Directional: true},
 		AnimationGun:  {Texture: rl.Texture2D{ID: 1}, Columns: 4, Rows: 8, Frames: 4, FPS: 16, Loop: false, Directional: true},
 	}, AnimationIdle)
 
@@ -64,7 +64,7 @@ func TestPlayerWalkAnimationAdvancesFrames(t *testing.T) {
 		t.Fatalf("atlas animation = %q, want %q", player.Renderer.SpriteAnimator.Current, AnimationWalk)
 	}
 
-	player.Renderer.Update(1.0 / 9.0)
+	player.Renderer.Update(1.0 / 6.0)
 	if player.Renderer.SpriteAnimator.Frame != 1 {
 		t.Fatalf("walk frame = %d, want 1", player.Renderer.SpriteAnimator.Frame)
 	}
@@ -79,7 +79,7 @@ func TestPlayerSprintAnimationUsesSprintClip(t *testing.T) {
 	player := newplayer(rl.Texture2D{ID: 1}, "Test")
 	player.Renderer.SpriteAnimator = NewSpriteAnimator(map[AnimationID]AnimationClip{
 		AnimationIdle:   {Texture: rl.Texture2D{ID: 1}, Columns: 4, Rows: 8, Frames: 4, FPS: 5, Loop: true},
-		AnimationSprint: {Texture: rl.Texture2D{ID: 1}, Columns: 4, Rows: 8, Frames: 4, FPS: 13, Loop: true, Directional: true},
+		AnimationSprint: {Texture: rl.Texture2D{ID: 1}, Columns: 8, Rows: 8, Frames: 8, FPS: 9, Loop: true, Directional: true},
 	}, AnimationIdle)
 
 	player.velocity.X = 1

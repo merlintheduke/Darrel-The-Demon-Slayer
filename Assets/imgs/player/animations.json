@@ -24,19 +24,19 @@
     },
     "walk": {
       "sheet": "Assets/imgs/player/walk.png",
-      "columns": 4,
+      "columns": 8,
       "rows": 8,
-      "frames": 4,
-      "fps": 9,
+      "frames": 8,
+      "fps": 6,
       "loop": true,
       "directional": true
     },
     "sprint": {
       "sheet": "Assets/imgs/player/sprint.png",
-      "columns": 4,
+      "columns": 8,
       "rows": 8,
-      "frames": 4,
-      "fps": 13,
+      "frames": 8,
+      "fps": 9,
       "loop": true,
       "directional": true
     },
