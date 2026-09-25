@@ -5,7 +5,7 @@ import (
 )
 
 func (gc *GameController) savemenu(savesmeta []SaveMeta) {
-	gc.menu = append(gc.menu, gc.buildSaveMenu(savesmeta))
+	gc.menus[selectsave] = gc.buildSaveMenu(savesmeta)
 }
 
 func (gc *GameController) buildSaveMenu(savesmeta []SaveMeta) Menu {
@@ -41,13 +41,19 @@ func (gc *GameController) buildSaveMenu(savesmeta []SaveMeta) Menu {
 }
 
 func (gc *GameController) RefreshSaveMenu() {
-	if int(selectsave) < len(gc.menu) {
-		gc.menu[selectsave] = gc.buildSaveMenu(gc.LoadSaves())
+	if _, ok := gc.menus[selectsave]; ok {
+		gc.menus[selectsave] = gc.buildSaveMenu(gc.LoadSaves())
 	}
 }
 
 func (gc *GameController) newsavebutton() {
-	b1 := gc.menu[selectsave].newButton(func() {}, rl.Vector2{X: 300, Y: 275}, 300, 50, "", int(button), false)
+	saveMenu, ok := gc.menus[selectsave]
+	if !ok {
+		return
+	}
+
+	b1 := saveMenu.newButton(func() {}, rl.Vector2{X: 300, Y: 275}, 300, 50, "", int(button), false)
 	b1.OnClick = func() { b1.allowUserInput = true }
-	gc.menu[selectsave].buttons = append(gc.menu[selectsave].buttons, b1)
+	saveMenu.buttons = append(saveMenu.buttons, b1)
+	gc.menus[selectsave] = saveMenu
 }

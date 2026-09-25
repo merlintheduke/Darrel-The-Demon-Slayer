@@ -13,7 +13,7 @@ type GameController struct {
 	currentRoom   int
 	enemies       []Enemy
 	attackManager AttackManager
-	menu          []Menu
+	menus         map[GameState]Menu
 	gamestate     GameState
 	camera        rl.Camera2D
 	saveslot      []SaveSlot
@@ -38,7 +38,6 @@ const (
 func NewGameController() GameController {
 	rooms := make([]Room, 0)
 	enemy := make([]Enemy, 0)
-	AllMenu := make([]Menu, 0)
 	camera := rl.NewCamera2D(
 		rl.Vector2{X: 0, Y: 0}, // offset
 		rl.Vector2{X: 0, Y: 0}, // target
@@ -48,7 +47,7 @@ func NewGameController() GameController {
 	GameController := GameController{
 		rooms:     rooms,
 		enemies:   enemy,
-		menu:      AllMenu,
+		menus:     make(map[GameState]Menu),
 		gamestate: menu,
 		camera:    camera,
 	}
@@ -57,15 +56,15 @@ func NewGameController() GameController {
 func (gc *GameController) Initialize() {
 	gc.setstate(menu)
 
-	gc.mainmenu()                                        // index 0
-	gc.savemenu(gc.LoadSaves())                          // index 1
-	gc.PlayingUI()                                       // index 2
-	gc.menu = append(gc.menu, newMenu(rl.Vector2Zero())) // home, index 3
-	gc.gameovermenu()                                    // gameover, index 4
-	gc.pausemenu()                                       // pause, index 5
-	gc.upgrademenu()                                     // index 6
-	gc.menu = append(gc.menu, newMenu(rl.Vector2Zero())) // buildmode, index 7
-	gc.menu = append(gc.menu, newMenu(rl.Vector2Zero())) // quit, index 8
+	gc.mainmenu()
+	gc.savemenu(gc.LoadSaves())
+	gc.PlayingUI()
+	gc.menus[home] = newMenu(rl.Vector2Zero())
+	gc.gameovermenu()
+	gc.pausemenu()
+	gc.upgrademenu()
+	gc.menus[buildmode] = newMenu(rl.Vector2Zero())
+	gc.menus[quit] = newMenu(rl.Vector2Zero())
 
 	gc.attackManager = AttackManager{}
 }
@@ -77,8 +76,8 @@ func (gc *GameController) Update() {
 		return
 	}
 
-	if int(gc.gamestate) < len(gc.menu) {
-		gc.menu[gc.gamestate].Update(gc)
+	if currentMenu, ok := gc.menus[gc.gamestate]; ok {
+		currentMenu.Update(gc)
 	}
 
 	if gc.gamestate == playing {
@@ -166,8 +165,8 @@ func (gc *GameController) Draw() {
 		gc.DrawUpgradeStats()
 	}
 
-	if int(gc.gamestate) < len(gc.menu) {
-		gc.menu[gc.gamestate].Draw()
+	if currentMenu, ok := gc.menus[gc.gamestate]; ok {
+		currentMenu.Draw()
 	}
 }
 func (gc *GameController) TriggerGameOver() {

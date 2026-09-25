@@ -3,7 +3,7 @@
     "PlayerName": "dawson",
     "Lvl": 6,
     "CreatedAt": "2026-09-24",
-    "LastPlayed": 1790297287,
+    "LastPlayed": 1790297656,
     "Index": 0
   },
   "Player": {
@@ -15,15 +15,15 @@
     "Angle": 0,
     "Scale": 1,
     "Speed": 325,
-    "MaxHealth": 150,
-    "CurrentHealth": 150,
+    "MaxHealth": 175,
+    "CurrentHealth": 175,
     "Alive": true,
     "Xp": 36,
     "Level": 6,
     "XpToNext": 303,
-    "UpgradePoints": 2,
+    "UpgradePoints": 0,
     "GunDamage": 25,
-    "MeleeDamage": 10,
+    "MeleeDamage": 15,
     "Roomscleared": 18,
     "Difficulty": 0
   },

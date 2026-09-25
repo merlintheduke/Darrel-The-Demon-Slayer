@@ -12,7 +12,7 @@ func (gc *GameController) PlayingUI() {
 	upgradeButton := playingMenu.newButton(func() { gc.setstate(upgrade) }, rl.Vector2{X: 720, Y: 20}, 250, 50, "UPGRADE", int(smallbutton), false)
 	pauseButton := playingMenu.newButton(func() { gc.setstate(pause) }, rl.Vector2{X: 720, Y: 80}, 250, 50, "PAUSE", int(smallbutton), false)
 	playingMenu.buttons = append(playingMenu.buttons, upgradeButton, pauseButton)
-	gc.menu = append(gc.menu, playingMenu)
+	gc.menus[playing] = playingMenu
 }
 
 func (gc *GameController) gameovermenu() {
@@ -32,7 +32,7 @@ func (gc *GameController) gameovermenu() {
 	gameOverMenu.textbox = append(gameOverMenu.textbox, title, message)
 	gameOverMenu.buttons = append(gameOverMenu.buttons, mainMenu)
 
-	gc.menu = append(gc.menu, gameOverMenu)
+	gc.menus[gameover] = gameOverMenu
 }
 
 func (gc *GameController) pausemenu() {
@@ -74,7 +74,7 @@ func (gc *GameController) pausemenu() {
 	pauseMenu.textbox = append(pauseMenu.textbox, confirmationText)
 	pauseMenu.buttons = append(pauseMenu.buttons, resume, upgrades, mainMenu, saveButton, closeButton, yesButton, noButton)
 
-	gc.menu = append(gc.menu, pauseMenu)
+	gc.menus[pause] = pauseMenu
 }
 
 func (gc *GameController) upgrademenu() {
@@ -95,7 +95,7 @@ func (gc *GameController) upgrademenu() {
 	upgradeMenu.textbox = append(upgradeMenu.textbox, title)
 	upgradeMenu.buttons = append(upgradeMenu.buttons, health, speed, gun, melee, back)
 
-	gc.menu = append(gc.menu, upgradeMenu)
+	gc.menus[upgrade] = upgradeMenu
 }
 
 func (gc *GameController) mainmenu() {
@@ -104,5 +104,5 @@ func (gc *GameController) mainmenu() {
 	start := homeMenu.newButton(func() { gc.gamestate = selectsave }, rl.Vector2{X: 400, Y: 300}, 200, 80 /*no sprite yet*/, "START", 0, false)
 	quit := homeMenu.newButton(func() { gc.setstate(quit) }, rl.Vector2{X: 400, Y: 420}, 200, 80, "QUIT", 0, false)
 	homeMenu.buttons = append(homeMenu.buttons, start, quit)
-	gc.menu = append(gc.menu, homeMenu)
+	gc.menus[menu] = homeMenu
 }
