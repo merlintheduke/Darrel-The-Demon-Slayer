@@ -9,6 +9,7 @@ import (
 
 type Encounter struct {
 	enemies    []Enemy
+	textures   []rl.Texture2D
 	started    bool
 	generated  bool
 	ended      bool
@@ -18,10 +19,11 @@ type Encounter struct {
 	p          *Player
 }
 
-func newencounter(difficulty int, p *Player) Encounter {
+func newencounter(difficulty int, p *Player, textures []rl.Texture2D) Encounter {
 	return Encounter{
 		difficulty: difficulty,
 		p:          p,
+		textures:   textures,
 	}
 }
 
@@ -66,7 +68,7 @@ func (e *Encounter) startEncounter(r *Room, roomdesc *roomdescriptor) {
 		spawnPos := r.randomFloorPosInRoom(roomdesc)
 
 		enemyType := randomEnemyType(e.difficulty, e.p.Roomscleared)
-		enemy := newEnemy(enemyType, spawnPos, e.p)
+		enemy := newEnemy(enemyType, spawnPos, e.p, e.textures)
 
 		e.enemies = append(e.enemies, enemy)
 	}
@@ -122,7 +124,7 @@ func (p *Player) quantityBasedOnDifficulty(difficulty int) int {
 	total := difficulty + p.Roomscleared/10
 
 	enemies := rand.IntN(3+total) + total + int(math.Floor(float64(p.Roomscleared/50.0)))
-	enemies += int(math.Floor(float64(p.Roomscleared/100.0)))
+	enemies += int(math.Floor(float64(p.Roomscleared / 100.0)))
 
 	if enemies < 1 {
 		enemies = 1

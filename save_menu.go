@@ -9,7 +9,7 @@ func (gc *GameController) savemenu(savesmeta []SaveMeta) {
 }
 
 func (gc *GameController) buildSaveMenu(savesmeta []SaveMeta) Menu {
-	savesMenu := newMenu(rl.Vector2{X: 0, Y: 0})
+	savesMenu := gc.newMenu(rl.Vector2{X: 0, Y: 0})
 
 	choosesave := savesMenu.newTextBox(rl.Vector2{X: 300, Y: 150}, "Choose Save", 50)
 	savesMenu.textbox = append(savesMenu.textbox, choosesave)

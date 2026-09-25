@@ -31,17 +31,17 @@ type EnemyConfig struct {
 	Speed     float32
 	Radius    float32
 
-	SenseRange      float32
-	PreferredRange  float32
-	TooCloseRange   float32
-	AttackRange     float32
-	AttackCooldown  float32
-	AttackDamage    int
-	XPReward        int
+	SenseRange     float32
+	PreferredRange float32
+	TooCloseRange  float32
+	AttackRange    float32
+	AttackCooldown float32
+	AttackDamage   int
+	XPReward       int
 
-	UsesProjectile  bool
+	UsesProjectile   bool
 	ProjectileSprite rl.Texture2D
-	MeleeRadius     float32
+	MeleeRadius      float32
 }
 
 type Enemy struct {
@@ -49,8 +49,9 @@ type Enemy struct {
 
 	Config EnemyConfig
 
-	target *Player
-	state  EnemyState
+	target   *Player
+	state    EnemyState
+	textures []rl.Texture2D
 
 	attackcooldown float32
 
@@ -58,7 +59,7 @@ type Enemy struct {
 	XPReward     int
 }
 
-func GetEnemyConfig(enemyType EnemyType) EnemyConfig {
+func GetEnemyConfig(enemyType EnemyType, textures []rl.Texture2D) EnemyConfig {
 	switch enemyType {
 	case RangedDemon:
 		return EnemyConfig{
@@ -151,14 +152,15 @@ func GetEnemyConfig(enemyType EnemyType) EnemyConfig {
 	}
 }
 
-func newEnemy(enemyType EnemyType, position rl.Vector2, target *Player) Enemy {
-	config := GetEnemyConfig(enemyType)
+func newEnemy(enemyType EnemyType, position rl.Vector2, target *Player, textures []rl.Texture2D) Enemy {
+	config := GetEnemyConfig(enemyType, textures)
 
 	enemy := Enemy{
-		Entity: newEntity(config.Sprite),
-		Config: config,
-		target: target,
-		state:  idle,
+		Entity:   newEntity(config.Sprite),
+		Config:   config,
+		target:   target,
+		state:    idle,
+		textures: textures,
 
 		AttackDamage: config.AttackDamage,
 		XPReward:     config.XPReward,
@@ -174,15 +176,15 @@ func newEnemy(enemyType EnemyType, position rl.Vector2, target *Player) Enemy {
 	enemy.CurrentHealth = config.MaxHealth
 	enemy.Alive = true
 
-	enemy.HealthBar = HealthBar{
+	enemy.Renderer.HealthBar = HealthBar{
 		Width:  70,
 		Height: 8,
 	}
 
-	enemy.totalFrames = 1
-	enemy.currentFrame = 1
-	enemy.Scale = 1
-	enemy.Color = rl.White
+	enemy.Renderer.totalFrames = 1
+	enemy.Renderer.currentFrame = 1
+	enemy.Renderer.Scale = 1
+	enemy.Renderer.Color = rl.White
 
 	enemy.SyncCollisionBox()
 
@@ -299,7 +301,7 @@ func (e *Enemy) TryAttack(attackManager *AttackManager) {
 		e,
 		e.Config.AttackDamage,
 		e.Config.MeleeRadius,
-		textures[Melee],
+		e.textures[melee],
 		1,
 	)
 }
@@ -318,7 +320,7 @@ func (e *Enemy) setpositiontile(x, y int) {
 }
 
 func (e *Enemy) settexture(t rl.Texture2D) {
-	e.Sprite = t
+	e.Renderer.Sprite = t
 }
 
 func (e *Enemy) TakeDamage(dmg int) bool {

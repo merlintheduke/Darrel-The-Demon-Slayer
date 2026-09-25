@@ -2,8 +2,6 @@ package main
 
 import rl "github.com/gen2brain/raylib-go/raylib"
 
-var sounds []rl.Sound
-
 type SoundEffect int
 
 const (
@@ -16,16 +14,16 @@ const (
 	buttonClickSound
 )
 
-func LoadSounds() {
+func LoadSounds() []rl.Sound {
 	sound0 := rl.LoadSound("Assets/sounds/shot.wav")
 	sound1 := rl.LoadSound("Assets/sounds/whoosh.wav")
-	
+
 	// SET VOLUME HERE
 	rl.SetSoundVolume(sound0, 2) // quieter gun
 	rl.SetSoundVolume(sound1, 2)
-	sounds = append(sounds, sound0, sound1)
+	return []rl.Sound{sound0, sound1}
 }
-func PlaySoundEffect(sound int) {
+func PlaySoundEffect(sounds []rl.Sound, sound int) {
 	if sound < 0 || sound >= len(sounds) {
 		return
 	}
@@ -33,7 +31,7 @@ func PlaySoundEffect(sound int) {
 	rl.PlaySound(sounds[sound])
 }
 
-func UnloadSounds() {
+func UnloadSounds(sounds []rl.Sound) {
 	for i := range sounds {
 		rl.UnloadSound(sounds[i])
 	}

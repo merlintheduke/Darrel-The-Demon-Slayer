@@ -2,25 +2,24 @@ package main
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
-	
 )
 
 type Player struct {
 	Entity
-	Xp           int
-	Level        int
-	XpToNext     int
+	Xp            int
+	Level         int
+	XpToNext      int
 	UpgradePoints int
 
-	GunDamage    int
-	MeleeDamage  int
+	GunDamage   int
+	MeleeDamage int
 
 	Roomscleared int
 	Difficulty   int
 }
 
 func newplayer(cowboySprite rl.Texture2D, Name string) Player {
-	
+
 	player := Player{
 		Entity: Entity{
 			Name: Name,
@@ -28,26 +27,25 @@ func newplayer(cowboySprite rl.Texture2D, Name string) Player {
 				pos:      rl.Vector2{X: 250, Y: 250},
 				velocity: rl.Vector2{X: 0, Y: 0},
 			},
-			SpriteRenderer: SpriteRenderer{
-			Sprite:       cowboySprite,
-			Color:        rl.White,
-			Position:     rl.Vector2{X: 250, Y: 250},
-			Angle:        0,
-			Scale:        1,
-			frameSize:    120,
-			totalFrames:  7,
-			currentFrame: 1,
+			Renderer: EntityRenderer{SpriteRenderer: SpriteRenderer{
+				Sprite:       cowboySprite,
+				Color:        rl.White,
+				Position:     rl.Vector2{X: 250, Y: 250},
+				Angle:        0,
+				Scale:        1,
+				frameSize:    120,
+				totalFrames:  7,
+				currentFrame: 1,
+			}, HealthBar: HealthBar{
+				Width:  80,
+				Height: 10,
+			}},
+			Speed:         300,
+			MaxHealth:     100,
+			CurrentHealth: 100,
+			Alive:         true,
 		},
-		HealthBar: HealthBar{
-					Width:  80,
-					Height: 10,
-				},
-		Speed:         300,
-		MaxHealth:     100,
-		CurrentHealth: 100,
-		Alive:         true,
-		},
-		
+
 		Xp:            0,
 		Level:         1,
 		XpToNext:      100,
@@ -55,24 +53,24 @@ func newplayer(cowboySprite rl.Texture2D, Name string) Player {
 		GunDamage:     10,
 		MeleeDamage:   10,
 	}
-	player.collisionBox = rl.NewRectangle(player.Position.X, player.Position.Y, 120*player.Scale, 120*player.Scale)
+	player.Position = player.pos
+	player.collisionBox = rl.NewRectangle(player.Position.X, player.Position.Y, 120*player.Renderer.Scale, 120*player.Renderer.Scale)
 	return player
 }
 
 func (e *Entity) move() {
 	e.pos = rl.Vector2Add(e.pos, rl.Vector2Scale(e.velocity, rl.GetFrameTime()))
 	e.SyncCollisionBox()
-	
-	
+
 }
 
 func newEntity(sprite rl.Texture2D) Entity {
 	Entity := Entity{
-			PhysicsBody: PhysicsBody{
-				pos:      rl.Vector2{X: 250, Y: 250},
-				velocity: rl.Vector2{X: 0, Y: 0},
-			},
-			SpriteRenderer: SpriteRenderer{
+		PhysicsBody: PhysicsBody{
+			pos:      rl.Vector2{X: 250, Y: 250},
+			velocity: rl.Vector2{X: 0, Y: 0},
+		},
+		Renderer: EntityRenderer{SpriteRenderer: SpriteRenderer{
 			Sprite:       sprite,
 			Color:        rl.White,
 			Position:     rl.Vector2{X: 250, Y: 250},
@@ -81,15 +79,15 @@ func newEntity(sprite rl.Texture2D) Entity {
 			frameSize:    120,
 			totalFrames:  7,
 			currentFrame: 1,
-		},
-		Atkrange:	  100,
+		}},
+		Atkrange:      100,
 		Speed:         50,
 		MaxHealth:     100,
 		CurrentHealth: 100,
 		Alive:         true,
-		}
-		return Entity
 	}
+	return Entity
+}
 
 func (e *Entity) Update(room *Room) {
 	e.move()
@@ -97,11 +95,12 @@ func (e *Entity) Update(room *Room) {
 	e.SyncCollisionBox() // keep it tight after correction
 }
 func (e *Entity) SyncCollisionBox() {
-	e.collisionBox.X = e.pos.X - e.collisionBox.Width / 2
-	e.collisionBox.Y = e.pos.Y - e.collisionBox.Height / 2
+	e.collisionBox.X = e.pos.X - e.collisionBox.Width/2
+	e.collisionBox.Y = e.pos.Y - e.collisionBox.Height/2
 	e.collisionBox.Height = 100
 	e.collisionBox.Width = 50
 	e.Position = e.pos
+	e.Renderer.Position = e.pos
 }
 func (p *Player) TakeDamage(dmg int) {
 	if !p.Alive {

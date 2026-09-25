@@ -7,12 +7,12 @@ import (
 )
 
 type GameController struct {
-	Sprites        []rl.Texture2D
 	player         Player
 	rooms          []Room
 	currentRoom    int
 	enemies        []Enemy
 	attackManager  AttackManager
+	assets         Assets
 	menus          map[GameState]Menu
 	saveRepository SaveRepository
 	gamestate      GameState
@@ -61,14 +61,14 @@ func (gc *GameController) Initialize() {
 	gc.mainmenu()
 	gc.savemenu(gc.LoadSaves())
 	gc.PlayingUI()
-	gc.menus[home] = newMenu(rl.Vector2Zero())
+	gc.menus[home] = gc.newMenu(rl.Vector2Zero())
 	gc.gameovermenu()
 	gc.pausemenu()
 	gc.upgrademenu()
-	gc.menus[buildmode] = newMenu(rl.Vector2Zero())
-	gc.menus[quit] = newMenu(rl.Vector2Zero())
+	gc.menus[buildmode] = gc.newMenu(rl.Vector2Zero())
+	gc.menus[quit] = gc.newMenu(rl.Vector2Zero())
 
-	gc.attackManager = AttackManager{}
+	gc.attackManager = AttackManager{Sounds: gc.assets.Sounds}
 }
 func (gc *GameController) GameState() {
 
@@ -125,11 +125,11 @@ func (gc *GameController) updatePlaying() {
 	dir := rl.Vector2Subtract(mouseWorld, gc.player.pos)
 
 	if rl.IsKeyPressed(rl.KeySpace) {
-		gc.attackManager.SpawnProjectile(gc.player.pos, dir, &gc.player, gc.player.GunDamage, textures[bullet], 0)
+		gc.attackManager.SpawnProjectile(gc.player.pos, dir, &gc.player, gc.player.GunDamage, gc.assets.Textures[bullet], 0)
 	}
 
 	if rl.IsKeyPressed(rl.KeyQ) {
-		gc.attackManager.SpawnMelee(gc.player.pos, dir, &gc.player, gc.player.MeleeDamage, 120, textures[melee], 1)
+		gc.attackManager.SpawnMelee(gc.player.pos, dir, &gc.player, gc.player.MeleeDamage, 120, gc.assets.Textures[melee], 1)
 	}
 
 	gc.player.Update(&gc.rooms[gc.currentRoom])
@@ -181,15 +181,15 @@ func (gc *GameController) TriggerGameOver() {
 }
 
 func (gc *GameController) ResetAfterGameOver() {
-	gc.player = newplayer(textures[cowboy], "")
+	gc.player = newplayer(gc.assets.Textures[cowboy], "")
 
 	gc.rooms = make([]Room, 0)
-	room := newRoom(100, textures[tile])
+	room := newRoom(100, gc.assets.Textures[tile])
 	room.BuildRoom()
 	gc.rooms = append(gc.rooms, room)
 
 	gc.currentRoom = 0
-	gc.attackManager = AttackManager{}
+	gc.attackManager = AttackManager{Sounds: gc.assets.Sounds}
 	gc.currentSave = nil
 
 	gc.RefreshSaveMenu()
@@ -198,12 +198,12 @@ func (gc *GameController) StartGame() {
 	gc.currentRoom = 0
 
 	if len(gc.rooms) == 0 {
-		room := newRoom(100, textures[tile])
+		room := newRoom(100, gc.assets.Textures[tile])
 		room.BuildRoom()
 		gc.rooms = append(gc.rooms, room)
 	}
 
-	gc.rooms[gc.currentRoom].SetupEncounters(&gc.player, gc.player.Difficulty)
+	gc.rooms[gc.currentRoom].SetupEncounters(&gc.player, gc.player.Difficulty, gc.assets.Textures)
 
 	gc.MovePlayerToRoomSpawn()
 
@@ -216,11 +216,6 @@ func (gc *GameController) StartGame() {
 
 func (gc *GameController) setstate(state GameState) {
 	gc.gamestate = state
-}
-func (gc *GameController) UnloadTextures() {
-	for i := range gc.Sprites {
-		rl.UnloadTexture(gc.Sprites[i])
-	}
 }
 func (gc *GameController) MovePlayerToRoomSpawn() {
 	if len(gc.rooms) == 0 {
@@ -235,6 +230,7 @@ func (gc *GameController) MovePlayerToRoomSpawn() {
 
 	gc.player.pos = spawn
 	gc.player.Position = spawn
+	gc.player.Renderer.Position = spawn
 	gc.player.SyncCollisionBox()
 
 	gc.camera.Target = gc.player.pos
@@ -411,12 +407,12 @@ func (gc *GameController) CurrentRoomCompleted() bool {
 
 func (gc *GameController) GoToNextRoom() {
 	// clear bullets/melee attacks from old room
-	gc.attackManager = AttackManager{}
+	gc.attackManager = AttackManager{Sounds: gc.assets.Sounds}
 
 	// make a brand new room
-	newRoom := newRoom(100, textures[tile])
+	newRoom := newRoom(100, gc.assets.Textures[tile])
 	newRoom.BuildRoom()
-	newRoom.SetupEncounters(&gc.player, gc.player.Difficulty)
+	newRoom.SetupEncounters(&gc.player, gc.player.Difficulty, gc.assets.Textures)
 
 	gc.rooms = append(gc.rooms, newRoom)
 

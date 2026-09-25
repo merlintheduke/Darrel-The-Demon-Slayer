@@ -8,6 +8,7 @@ type MenuAction int
 type Menu struct {
 	pos        rl.Vector2
 	background SpriteRenderer
+	textures   []rl.Texture2D
 	textbox    []*TextBox
 	buttons    []*Button
 	displayed  bool
@@ -45,7 +46,7 @@ func (t TextBox) displayText() {
 	rl.DrawText(t.contents, int32(t.pos.X), int32(t.pos.Y), int32(t.size), rl.Black)
 }
 func (menu *Menu) newButton(OnClick func(), pos rl.Vector2, width, height float32, text string, spritenumber int, usesSprite bool) *Button {
-	sprite := NewSpriteRenderer(spritenumber, rl.White, rl.Vector2Add(menu.pos, pos), 1, 0)
+	sprite := NewSpriteRenderer(menu.textures[spritenumber], rl.White, rl.Vector2Add(menu.pos, pos), 1, 0)
 	rec := rl.Rectangle{
 		X:      pos.X + menu.pos.X,
 		Y:      pos.Y + menu.pos.Y,
@@ -93,11 +94,16 @@ func (b *Button) displayButton() { //implement button sprite
 	}
 }
 
-func newMenu(pos rl.Vector2) Menu {
+func newMenu(pos rl.Vector2, textures []rl.Texture2D) Menu {
 	return Menu{
 		pos:       pos,
+		textures:  textures,
 		displayed: true,
 	}
+}
+
+func (gc *GameController) newMenu(pos rl.Vector2) Menu {
+	return newMenu(pos, gc.assets.Textures)
 }
 func (menu *Menu) Draw() {
 	menu.background.Draw()
@@ -147,6 +153,6 @@ func (b *Button) getUserInput(gc *GameController) {
 		b.allowUserInput = false
 
 		gc.NewSaveGame(b.text)
-		
+
 	}
 }

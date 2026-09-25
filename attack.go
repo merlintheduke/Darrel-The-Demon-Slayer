@@ -28,17 +28,18 @@ type Attack struct {
 
 	Radius float32
 
-	Owner interface{}
+	Owner       interface{}
 	soundeffect func()
-	OnHit func(target interface{})
+	OnHit       func(target interface{})
 }
 
 type AttackManager struct {
 	Attacks []Attack
+	Sounds  []rl.Sound
 }
 
 func (am *AttackManager) SpawnProjectile(pos, dir rl.Vector2, owner interface{}, dmg int, sprite rl.Texture2D, soundeffect int) {
-	PlaySoundEffect(soundeffect)
+	PlaySoundEffect(am.Sounds, soundeffect)
 	if dir.X == 0 && dir.Y == 0 {
 		return
 	}
@@ -75,21 +76,21 @@ func (am *AttackManager) SpawnProjectile(pos, dir rl.Vector2, owner interface{},
 	am.Attacks = append(am.Attacks, a)
 }
 
-func (am *AttackManager) SpawnMelee(pos, dir rl.Vector2, owner interface{}, dmg int, radius float32,sprite rl.Texture2D,soundeffect int) {
-	PlaySoundEffect(soundeffect)
+func (am *AttackManager) SpawnMelee(pos, dir rl.Vector2, owner interface{}, dmg int, radius float32, sprite rl.Texture2D, soundeffect int) {
+	PlaySoundEffect(am.Sounds, soundeffect)
 	if dir.X == 0 && dir.Y == 0 {
 		dir = rl.Vector2{X: 1, Y: 0}
 	}
 	angle := float32(math.Atan2(float64(dir.Y), float64(dir.X)) * 180 / math.Pi)
 	dir = rl.Vector2Normalize(dir)
-	
+
 	hitPos := rl.Vector2Add(pos, rl.Vector2Scale(dir, radius))
 
 	a := Attack{
 		Type: Melee,
 
 		PhysicsBody: PhysicsBody{
-			pos: hitPos ,
+			pos: hitPos,
 		},
 		SpriteRenderer: SpriteRenderer{
 			Sprite:       sprite,

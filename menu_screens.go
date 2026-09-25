@@ -5,7 +5,7 @@ import (
 )
 
 func (gc *GameController) PlayingUI() {
-	playingMenu := newMenu(rl.Vector2Zero())
+	playingMenu := gc.newMenu(rl.Vector2Zero())
 	playingMenu.CustomDraw = func() {
 		gc.DrawPlayerGUI()
 	}
@@ -16,7 +16,7 @@ func (gc *GameController) PlayingUI() {
 }
 
 func (gc *GameController) gameovermenu() {
-	gameOverMenu := newMenu(rl.Vector2Zero())
+	gameOverMenu := gc.newMenu(rl.Vector2Zero())
 
 	title := gameOverMenu.newTextBox(rl.Vector2{X: 330, Y: 220}, "GAME OVER", 70)
 
@@ -36,7 +36,7 @@ func (gc *GameController) gameovermenu() {
 }
 
 func (gc *GameController) pausemenu() {
-	pauseMenu := newMenu(rl.Vector2Zero())
+	pauseMenu := gc.newMenu(rl.Vector2Zero())
 
 	title := pauseMenu.newTextBox(rl.Vector2{X: 410, Y: 180}, "PAUSED", 60)
 	resume := pauseMenu.newButton(func() { gc.setstate(playing) }, rl.Vector2{X: 380, Y: 300}, 260, 70, "RESUME", int(button), false)
@@ -78,7 +78,7 @@ func (gc *GameController) pausemenu() {
 }
 
 func (gc *GameController) upgrademenu() {
-	upgradeMenu := newMenu(rl.Vector2Zero())
+	upgradeMenu := gc.newMenu(rl.Vector2Zero())
 
 	title := upgradeMenu.newTextBox(rl.Vector2{X: 330, Y: 120}, "UPGRADES", 60)
 
@@ -99,8 +99,8 @@ func (gc *GameController) upgrademenu() {
 }
 
 func (gc *GameController) mainmenu() {
-	homeMenu := newMenu(rl.Vector2{X: 0, Y: 0})
-	homeMenu.background = NewSpriteRenderer(7, rl.White, rl.Vector2{X: 500, Y: 450}, .6, 0)
+	homeMenu := gc.newMenu(rl.Vector2{X: 0, Y: 0})
+	homeMenu.background = NewSpriteRenderer(gc.assets.Textures[menubackground], rl.White, rl.Vector2{X: 500, Y: 450}, .6, 0)
 	start := homeMenu.newButton(func() { gc.gamestate = selectsave }, rl.Vector2{X: 400, Y: 300}, 200, 80 /*no sprite yet*/, "START", 0, false)
 	quit := homeMenu.newButton(func() { gc.setstate(quit) }, rl.Vector2{X: 400, Y: 420}, 200, 80, "QUIT", 0, false)
 	homeMenu.buttons = append(homeMenu.buttons, start, quit)

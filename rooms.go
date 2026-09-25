@@ -7,7 +7,9 @@ import (
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
+
 type TileType int
+
 const (
 	nothing TileType = iota
 	floor
@@ -16,15 +18,16 @@ const (
 	door
 	completeddoor
 )
+
 type Room struct {
-	Tiles [][]TileType
+	Tiles          [][]TileType
 	Roomdescriptor []roomdescriptor
-	walls []rl.Vector2
+	walls          []rl.Vector2
 	//rooms
 	roomspawn rl.Vector2
-	pos      rl.Vector2
-	tileSize float32
-	sprite rl.Texture2D 
+	pos       rl.Vector2
+	tileSize  float32
+	sprite    rl.Texture2D
 }
 
 func newRoom(tileSize float32, sprite rl.Texture2D) Room {
@@ -32,27 +35,27 @@ func newRoom(tileSize float32, sprite rl.Texture2D) Room {
 	for i := range tile {
 		tile[i] = make([]TileType, 300)
 	}
-	roomdesc := make([]roomdescriptor,0)
-	walls := make([]rl.Vector2,0)
+	roomdesc := make([]roomdescriptor, 0)
+	walls := make([]rl.Vector2, 0)
 	room := Room{
-		Tiles:    tile,
+		Tiles:          tile,
 		Roomdescriptor: roomdesc,
-		walls: walls,
-		pos:      rl.Vector2Zero(),
-		tileSize: tileSize,
-		sprite:   sprite,
+		walls:          walls,
+		pos:            rl.Vector2Zero(),
+		tileSize:       tileSize,
+		sprite:         sprite,
 	}
 	return room
 }
 
 func (r Room) Draw() {
-	
+
 	for i := 0; i < len(r.Tiles); i++ {
 		for j := 0; j < len(r.Tiles[i]); j++ {
-				x := r.pos.X + float32(j)*r.tileSize
-				y := r.pos.Y + float32(i)*r.tileSize
+			x := r.pos.X + float32(j)*r.tileSize
+			y := r.pos.Y + float32(i)*r.tileSize
 			switch TileType(r.Tiles[i][j]) {
-			case nothing: 
+			case nothing:
 				continue
 			case wall:
 				rl.DrawRectangle(int32(x), int32(y), int32(r.tileSize), int32(r.tileSize), rl.DarkGreen)
@@ -64,10 +67,10 @@ func (r Room) Draw() {
 				rl.DrawTextureV(r.sprite, rl.Vector2{X: x, Y: y}, rl.White)
 			case door:
 				rl.DrawRectangle(int32(x), int32(y), int32(r.tileSize), int32(r.tileSize), rl.Black)
-				case completeddoor:
+			case completeddoor:
 				rl.DrawTextureV(r.sprite, rl.Vector2{X: x, Y: y}, rl.Green)
 			}
-			
+
 		}
 	}
 }
@@ -92,7 +95,7 @@ func (r *Room) SetRoom(pos, doorway rl.Vector2, width int, height int) {
 					r.Tiles[i+int(pos.Y)][j+int(pos.X)] = corner
 				} else {
 					r.Tiles[i+int(pos.Y)][j+int(pos.X)] = wall
-					r.walls = append(r.walls, rl.Vector2{X: float32(j+int(pos.X)), Y: float32(i + int(pos.Y))})
+					r.walls = append(r.walls, rl.Vector2{X: float32(j + int(pos.X)), Y: float32(i + int(pos.Y))})
 				}
 			} else {
 				r.Tiles[i+int(pos.Y)][j+int(pos.X)] = floor
@@ -118,7 +121,7 @@ func (r *Room) SetRoomV(pos, pos2, doorway rl.Vector2) {
 					r.Tiles[i+int(pos.Y)][j+int(pos.X)] = corner
 				} else {
 					r.Tiles[i+int(pos.Y)][j+int(pos.X)] = wall
-					r.walls = append(r.walls, rl.Vector2{X: float32(j+int(pos.X)), Y: float32(i + int(pos.Y))})
+					r.walls = append(r.walls, rl.Vector2{X: float32(j + int(pos.X)), Y: float32(i + int(pos.Y))})
 				}
 			} else {
 				r.Tiles[i+int(pos.Y)][j+int(pos.X)] = floor
@@ -134,7 +137,7 @@ func (r *Room) RoomBuilderView() {
 	mouse.X = float32(math.Ceil(float64(mouse.X)))
 	mouse.Y = float32(math.Ceil(float64(mouse.Y)))
 	rl.DrawText(fmt.Sprintf("%.0f, %.0f", mouse.X, mouse.Y), int32(mousepos.X), int32(mousepos.Y), 20, rl.RayWhite)
-	if rl.CheckCollisionPointRec(mousepos, rl.Rectangle{X: mouse.X*r.tileSize, Y: mouse.Y*r.tileSize, Width: 12, Height: 12}) && room.lock == false {
+	if rl.CheckCollisionPointRec(mousepos, rl.Rectangle{X: mouse.X * r.tileSize, Y: mouse.Y * r.tileSize, Width: 12, Height: 12}) && room.lock == false {
 		room.lock = true
 		room.firsttile = mouse
 		rl.DrawRectangle(int32(room.firsttile.X*r.tileSize), int32(room.firsttile.Y*r.tileSize), int32(r.tileSize/10), int32(r.tileSize/10), rl.Green)
@@ -147,7 +150,6 @@ func (r *Room) RoomBuilderView() {
 func (r *Room) BuildRoom() {
 	r.GenerateDungeon(20)
 }
-
 
 func (r *Room) RandomRoom() bool {
 	width := rand.IntN(8) + 6
@@ -283,8 +285,8 @@ func (r *Room) GenerateDungeon(goal int) {
 	}
 
 	startDoor := rl.Vector2{
-	X: float32(startX + startW/2),
-	Y: float32(startY),
+		X: float32(startX + startW/2),
+		Y: float32(startY),
 	}
 
 	r.Roomdescriptor = append(r.Roomdescriptor,
@@ -311,7 +313,7 @@ func (r *Room) GenerateDungeon(goal int) {
 		}
 	}
 }
-func (r *Room) SetupEncounters(p *Player, difficulty int) {
+func (r *Room) SetupEncounters(p *Player, difficulty int, textures []rl.Texture2D) {
 	for i := range r.Roomdescriptor {
 		// Start room should not have an encounter.
 		if i == 0 {
@@ -320,10 +322,11 @@ func (r *Room) SetupEncounters(p *Player, difficulty int) {
 		}
 
 		if r.Roomdescriptor[i].Encounter == nil {
-			encounter := newencounter(difficulty, p)
+			encounter := newencounter(difficulty, p, textures)
 			r.Roomdescriptor[i].Encounter = &encounter
 		} else {
 			r.Roomdescriptor[i].Encounter.p = p
+			r.Roomdescriptor[i].Encounter.textures = textures
 		}
 	}
 }
