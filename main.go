@@ -21,7 +21,7 @@ func main() {
 	//Screensize and window setup
 	rl.SetConfigFlags(rl.FlagWindowUndecorated)
 
-	rl.InitWindow(1000, 1000, "GAME")
+	rl.InitWindow(gameWindowWidth, gameWindowHeight, "GAME")
 
 	defer rl.CloseWindow()
 	rl.SetTargetFPS(60)
@@ -44,7 +44,7 @@ func main() {
 	gc := NewGameController()
 	gc.assets = assets
 	gc.player = newplayer(assets.Textures[cowboy], "")
-	room := newRoom(100, assets.Textures[tile])
+	room := newRoom(defaultTileSize, assets.Textures[tile])
 	room.BuildRoom()
 	gc.rooms = append(gc.rooms, room)
 

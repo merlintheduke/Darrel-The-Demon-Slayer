@@ -133,7 +133,7 @@ func (r *Room) SetRoomV(pos, pos2, doorway rl.Vector2) {
 func (r *Room) RoomBuilderView() {
 	room := r.Roomdescriptor[0]
 	mousepos := rl.GetMousePosition()
-	mouse := rl.Vector2Scale(mousepos, float32(r.tileSize/1000))
+	mouse := rl.Vector2Scale(mousepos, r.tileSize/float32(gameWindowWidth))
 	mouse.X = float32(math.Ceil(float64(mouse.X)))
 	mouse.Y = float32(math.Ceil(float64(mouse.Y)))
 	rl.DrawText(fmt.Sprintf("%.0f, %.0f", mouse.X, mouse.Y), int32(mousepos.X), int32(mousepos.Y), 20, rl.RayWhite)

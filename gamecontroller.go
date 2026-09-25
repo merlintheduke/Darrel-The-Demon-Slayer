@@ -103,7 +103,7 @@ func (gc *GameController) updateStateTransitions() bool {
 
 func (gc *GameController) updatePlaying() {
 	gc.camera.Target = gc.player.pos
-	gc.camera.Offset = rl.Vector2{X: 500, Y: 500}
+	gc.camera.Offset = rl.Vector2{X: cameraCenterX, Y: cameraCenterY}
 
 	gc.player.velocity = rl.Vector2{X: 0, Y: 0}
 
@@ -159,11 +159,11 @@ func (gc *GameController) Draw() {
 	}
 
 	if gc.gamestate == pause {
-		rl.DrawRectangle(0, 0, 1000, 1000, rl.Color{R: 0, G: 0, B: 0, A: 120})
+		rl.DrawRectangle(0, 0, gameWindowWidth, gameWindowHeight, rl.Color{R: 0, G: 0, B: 0, A: 120})
 	}
 
 	if gc.gamestate == upgrade {
-		rl.DrawRectangle(0, 0, 1000, 1000, rl.Color{R: 0, G: 0, B: 0, A: 160})
+		rl.DrawRectangle(0, 0, gameWindowWidth, gameWindowHeight, rl.Color{R: 0, G: 0, B: 0, A: 160})
 		gc.DrawUpgradeStats()
 	}
 
@@ -184,7 +184,7 @@ func (gc *GameController) ResetAfterGameOver() {
 	gc.player = newplayer(gc.assets.Textures[cowboy], "")
 
 	gc.rooms = make([]Room, 0)
-	room := newRoom(100, gc.assets.Textures[tile])
+	room := newRoom(defaultTileSize, gc.assets.Textures[tile])
 	room.BuildRoom()
 	gc.rooms = append(gc.rooms, room)
 
@@ -198,7 +198,7 @@ func (gc *GameController) StartGame() {
 	gc.currentRoom = 0
 
 	if len(gc.rooms) == 0 {
-		room := newRoom(100, gc.assets.Textures[tile])
+		room := newRoom(defaultTileSize, gc.assets.Textures[tile])
 		room.BuildRoom()
 		gc.rooms = append(gc.rooms, room)
 	}
@@ -208,7 +208,7 @@ func (gc *GameController) StartGame() {
 	gc.MovePlayerToRoomSpawn()
 
 	gc.camera.Target = gc.player.pos
-	gc.camera.Offset = rl.Vector2{X: 500, Y: 500}
+	gc.camera.Offset = rl.Vector2{X: cameraCenterX, Y: cameraCenterY}
 	gc.camera.Zoom = 1
 
 	gc.setstate(playing)
@@ -410,7 +410,7 @@ func (gc *GameController) GoToNextRoom() {
 	gc.attackManager = AttackManager{Sounds: gc.assets.Sounds}
 
 	// make a brand new room
-	newRoom := newRoom(100, gc.assets.Textures[tile])
+	newRoom := newRoom(defaultTileSize, gc.assets.Textures[tile])
 	newRoom.BuildRoom()
 	newRoom.SetupEncounters(&gc.player, gc.player.Difficulty, gc.assets.Textures)
 
@@ -425,6 +425,6 @@ func (gc *GameController) GoToNextRoom() {
 	gc.MovePlayerToRoomSpawn()
 
 	gc.camera.Target = gc.player.pos
-	gc.camera.Offset = rl.Vector2{X: 500, Y: 500}
+	gc.camera.Offset = rl.Vector2{X: cameraCenterX, Y: cameraCenterY}
 	gc.camera.Zoom = 1
 }

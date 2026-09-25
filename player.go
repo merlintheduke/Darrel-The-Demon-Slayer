@@ -24,13 +24,13 @@ func newplayer(cowboySprite rl.Texture2D, Name string) Player {
 		Entity: Entity{
 			Name: Name,
 			PhysicsBody: PhysicsBody{
-				pos:      rl.Vector2{X: 250, Y: 250},
+				pos:      rl.Vector2{X: playerSpawnX, Y: playerSpawnY},
 				velocity: rl.Vector2{X: 0, Y: 0},
 			},
 			Renderer: EntityRenderer{SpriteRenderer: SpriteRenderer{
 				Sprite:       cowboySprite,
 				Color:        rl.White,
-				Position:     rl.Vector2{X: 250, Y: 250},
+				Position:     rl.Vector2{X: playerSpawnX, Y: playerSpawnY},
 				Angle:        0,
 				Scale:        1,
 				frameSize:    120,
@@ -67,13 +67,13 @@ func (e *Entity) move() {
 func newEntity(sprite rl.Texture2D) Entity {
 	Entity := Entity{
 		PhysicsBody: PhysicsBody{
-			pos:      rl.Vector2{X: 250, Y: 250},
+			pos:      rl.Vector2{X: playerSpawnX, Y: playerSpawnY},
 			velocity: rl.Vector2{X: 0, Y: 0},
 		},
 		Renderer: EntityRenderer{SpriteRenderer: SpriteRenderer{
 			Sprite:       sprite,
 			Color:        rl.White,
-			Position:     rl.Vector2{X: 250, Y: 250},
+			Position:     rl.Vector2{X: playerSpawnX, Y: playerSpawnY},
 			Angle:        0,
 			Scale:        1,
 			frameSize:    120,
@@ -97,8 +97,8 @@ func (e *Entity) Update(room *Room) {
 func (e *Entity) SyncCollisionBox() {
 	e.collisionBox.X = e.pos.X - e.collisionBox.Width/2
 	e.collisionBox.Y = e.pos.Y - e.collisionBox.Height/2
-	e.collisionBox.Height = 100
-	e.collisionBox.Width = 50
+	e.collisionBox.Height = entityCollisionHeight
+	e.collisionBox.Width = entityCollisionWidth
 	e.Position = e.pos
 	e.Renderer.Position = e.pos
 }

@@ -102,7 +102,7 @@ func (sp SavePlayer) toPlayer() Player {
 		Difficulty:    sp.Difficulty,
 	}
 	if p.Position == (rl.Vector2{}) {
-		p.Position = rl.Vector2{X: 250, Y: 250}
+		p.Position = rl.Vector2{X: playerSpawnX, Y: playerSpawnY}
 	}
 	p.pos = p.Position
 	p.collisionBox = rl.NewRectangle(p.pos.X-25, p.pos.Y-50, 50, 100)
@@ -240,13 +240,13 @@ func (gc *GameController) LoadGame(playerName string) error {
 		Exists:     true,
 	}
 	if len(gc.rooms) == 0 {
-		room := newRoom(100, gc.assets.Textures[tile])
+		room := newRoom(defaultTileSize, gc.assets.Textures[tile])
 		room.BuildRoom()
 		gc.rooms = append(gc.rooms, room)
 	}
 
 	gc.camera.Target = gc.player.pos
-	gc.camera.Offset = rl.Vector2{X: 500, Y: 500}
+	gc.camera.Offset = rl.Vector2{X: cameraCenterX, Y: cameraCenterY}
 	gc.camera.Zoom = 1
 
 	gc.setstate(playing)
@@ -265,7 +265,7 @@ func (gc *GameController) FixPlayerAfterLoad() {
 	if gc.player.Position.X != 0 || gc.player.Position.Y != 0 {
 		gc.player.pos = gc.player.Position
 	} else {
-		gc.player.pos = rl.Vector2{X: 250, Y: 250}
+		gc.player.pos = rl.Vector2{X: playerSpawnX, Y: playerSpawnY}
 		gc.player.Position = gc.player.pos
 	}
 
